@@ -1,0 +1,101 @@
+
+<div class="container">
+    <div class="jumbotron">
+            <div class="text-center"><img class="burgerImage mx-auto" src="https://pbs.twimg.com/profile_images/683850520528859136/D-t-BWGz_400x400.jpg" />
+            <h1 class="display-4">Eat Da Burger</h1>
+            </div>
+    </div>
+    <div class="row">
+        <div class="col-4">
+            <div class="card" style="width: 18rem;">
+                <ul class="list-group list-group-flush">
+                    {{#each burgers}}
+                        {{#unless devoured}}
+                        <li class="list-group-item">
+                            {{this.burger}}
+                            <button type = "button" data-burgerId = "{{this.id}}" class = "btn btn-danger devBurger">Devour It!</button>
+                        </li>
+                        {{/unless}}
+                    {{/each}}
+                </ul>
+            </div>
+        </div>
+        <div class="col-4">
+            <div class="card" style="width: 18rem;">
+                <div class="card-body">
+                     <div class="form-group">
+                        <textarea class="form-control burger" id="exampleFormControlTextarea1" rows="3"></textarea>
+                        <p class="card-text"><small>Enter a burger you would like to eat and hit submit</small></p>
+                    </div>
+                    <button type="button" class="btn btn-primary addBurger">Submit</button>
+                </div>
+            </div>
+        </div>
+        <div class="col-4">
+            <div class="card" style="width: 18rem;">
+                <ul class="list-group list-group-flush">
+                    {{#each burgers}}
+                        {{#if devoured}}
+                        <li class="list-group-item">
+                            {{this.burger}}
+                        </li>
+                        {{/if}}
+                    {{/each}}
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <script type = "text/javascript">
+
+    //ADD BURGER
+    $(".addBurger").on("click", function(event) {
+        //stop form from submitting 
+        event.preventDefault();
+        console.log("button working");
+        //get data from from and create object
+        var newBurger = {
+            burger:     $(".burger").val().trim(),
+            devoured:   0
+        }
+
+        //Send the POST request
+        $.ajax("/burgers", {
+            type:   "POST",
+            data:   newBurger
+        }).then(
+            function() {
+                console.log('added new burger');
+                location.reload();
+            }
+        );
+
+    });
+
+
+    //DEVOUR BURGER AND SEND IT TO THE OTHER SIDE
+    $(".devBurger").on("click", function () {
+        //stop form from submitting
+        event.preventDefault();
+
+        var id = $(this).data("burgerid");
+
+        var devouredBurger = {
+            id:     id
+        }
+
+        //Send the PUT request
+        $.ajax("/burgers/"+ id, {
+            type: "PUT",
+            data: devouredBurger
+        }).then(
+            function() {
+                console.log("updated id", id);
+                //Reload the page to get the updated list
+                location.reload();
+            }
+        );
+
+    });
+        </script>
+
